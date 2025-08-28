@@ -55,7 +55,7 @@ No servers. No databases. No complexity. Just text files and Git.
 
 ```bash
 # Install in 60 seconds
-curl -sSL https://raw.githubusercontent.com/yourusername/claude-lazy-genius/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Aatish-Dhami/claude-lazy-genius/main/install.sh | bash
 
 # Start using Claude - everything is now tracked automatically
 claude
@@ -66,7 +66,7 @@ claude
 **Team Lead** (once):
 ```bash
 # Install and initialize
-curl -sSL https://raw.githubusercontent.com/yourusername/claude-lazy-genius/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Aatish-Dhami/claude-lazy-genius/main/install.sh | bash
 git add .claude-team
 git commit -m "Initialize team knowledge"
 git push
