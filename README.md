@@ -2,15 +2,15 @@
 
 **Make Claude remember everything. Forever. In 60 seconds.**
 
-[![Setup Time](https://img.shields.io/badge/Setup-60%20seconds-brightgreen)](https://github.com/yourusername/claude-lazy-genius)
-[![Dependencies](https://img.shields.io/badge/Dependencies-Zero-blue)](https://github.com/yourusername/claude-lazy-genius)
-[![Performance](https://img.shields.io/badge/Overhead-<1ms-orange)](https://github.com/yourusername/claude-lazy-genius)
+[![Setup Time](https://img.shields.io/badge/Setup-60%20seconds-brightgreen)](https://github.com/Aatish-Dhami/claude-lazy-genius)
+[![Dependencies](https://img.shields.io/badge/Dependencies-Zero-blue)](https://github.com/Aatish-Dhami/claude-lazy-genius)
+[![Performance](https://img.shields.io/badge/Overhead-<1ms-orange)](https://github.com/Aatish-Dhami/claude-lazy-genius)
 [![License](https://img.shields.io/badge/License-MIT-purple)](LICENSE)
 
 ## 🚀 Install (One Command)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/yourusername/claude-lazy-genius/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Aatish-Dhami/claude-lazy-genius/main/install.sh | bash
 ```
 
 That's it. You're done. Claude now has perfect memory.
@@ -223,8 +223,8 @@ Built with ❤️ by developers tired of:
 ## 🔗 Links
 
 - [Documentation](docs/)
-- [Report Issues](https://github.com/yourusername/claude-lazy-genius/issues)
-- [Discussions](https://github.com/yourusername/claude-lazy-genius/discussions)
+- [Report Issues](https://github.com/Aatish-Dhami/claude-lazy-genius/issues)
+- [Discussions](https://github.com/Aatish-Dhami/claude-lazy-genius/discussions)
 
 ---
 

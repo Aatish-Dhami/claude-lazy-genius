@@ -1,6 +1,6 @@
 #!/bin/bash
 # Claude Lazy Genius - The 60-Second Knowledge System for Claude
-# https://github.com/yourusername/claude-lazy-genius
+# https://github.com/Aatish-Dhami/claude-lazy-genius
 
 set -e
 
@@ -12,7 +12,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="https://raw.githubusercontent.com/yourusername/claude-lazy-genius/main"
+REPO_URL="https://raw.githubusercontent.com/Aatish-Dhami/claude-lazy-genius/main"
 VERSION="1.0.0"
 
 # Banner
@@ -360,7 +360,7 @@ print_success() {
     echo "  ${GREEN}.claude-team/scripts/sync.sh${NC}    - Sync with team"
     echo "  ${GREEN}cat .claude-team/daily/$(date +%Y-%m-%d)-*.md${NC} - See today's work"
     echo ""
-    echo -e "${YELLOW}📚 Documentation:${NC} https://github.com/yourusername/claude-lazy-genius"
+    echo -e "${YELLOW}📚 Documentation:${NC} https://github.com/Aatish-Dhami/claude-lazy-genius"
     echo ""
 }
 
