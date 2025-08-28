@@ -1,0 +1,82 @@
+{
+  "description": "Claude Lazy Genius - Advanced Hooks (Power Users)",
+  "version": "1.0.0",
+  "hooks": {
+    "SessionStart": [
+      {
+        "description": "Initialize with full context",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .claude-team/{daily,memory/context} && echo \"Session: $(date +'%Y-%m-%d %H:%M:%S')\\nDeveloper: $(git config user.name)\\nBranch: $(git branch --show-current)\\nLast Commit: $(git log -1 --oneline 2>/dev/null || echo 'none')\" > .claude/session.md && [ -f .claude-team/memory/context/current.md ] && cat .claude-team/memory/context/current.md >> .claude/session.md || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "description": "Track with full context",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]'); FILE=$(echo $CLAUDE_TOOL_INPUT | grep -o '\"file_path\":[^,}]*' | cut -d'\"' -f4); echo \"$(date +%H:%M:%S) [$DEV] Edit: $FILE\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\" && echo \"$FILE\" >> \".claude/session-files.tmp\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "description": "Track command execution",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]'); CMD=$(echo $CLAUDE_TOOL_INPUT | grep -o '\"command\":[^,}]*' | cut -d'\"' -f4); echo \"$(date +%H:%M:%S) [$DEV] Command: ${CMD:0:100}\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\""
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "description": "Track files being read for context",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $CLAUDE_TOOL_INPUT | grep -o '\"file_path\":[^,}]*' | cut -d'\"' -f4); echo \"$(date +%H:%M:%S) Read: $FILE\" >> .claude/reads.log"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "description": "Generate session summary",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]'); echo \"\\n## Session Summary\\nDuration: $(($(date +%s) - $(stat -f %B .claude/session.md 2>/dev/null || echo $(date +%s))))s\\nFiles modified: $(sort -u .claude/session-files.tmp 2>/dev/null | wc -l || echo 0)\\n\\n---\\n\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\" && rm -f .claude/session-files.tmp"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "description": "Full intent logging",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INTENT=$(echo \"$CLAUDE_USER_PROMPT\" | head -c 500 | tr '\\n' ' '); echo \"$(date +'%Y-%m-%d %H:%M:%S') | $INTENT\" >> .claude/intents.log"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "description": "Archive before context window cleanup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Context compacted at $(date)\" >> .claude/compact.log"
+          }
+        ]
+      }
+    ]
+  }
+}

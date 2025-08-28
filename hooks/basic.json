@@ -1,0 +1,40 @@
+{
+  "description": "Claude Lazy Genius - Basic Hooks (Solo Developer)",
+  "version": "1.0.0",
+  "hooks": {
+    "SessionStart": [
+      {
+        "description": "Initialize session",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Session: $(date +'%Y-%m-%d %H:%M')\" > .claude/session.md"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "description": "Track file changes",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$(date +%H:%M) Edit: $(echo $CLAUDE_TOOL_INPUT | grep -o '\"file_path\":[^,}]*' | cut -d'\"' -f4 || echo 'file')\" >> \".claude-team/daily/$(date +%Y-%m-%d).md\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "description": "End session",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"\\nSession ended: $(date +%H:%M)\\n\" >> \".claude-team/daily/$(date +%Y-%m-%d).md\""
+          }
+        ]
+      }
+    ]
+  }
+}
