@@ -1,0 +1,5 @@
+# Claude Lazy Genius merge strategies
+.claude-team/daily/*.md merge=union
+.claude-team/ANTIPATTERNS.md merge=union
+.claude-team/SOLUTIONS.md merge=union
+*.md text eol=lf
