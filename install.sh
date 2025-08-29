@@ -83,8 +83,8 @@ detect_setup_type() {
 create_directories() {
     echo -e "${BLUE}📁 Creating directory structure...${NC}"
     
-    # Local Claude directory (git-ignored)
-    mkdir -p .claude
+    # Local Claude directory and hooks subdirectory (git-ignored)
+    mkdir -p .claude/hooks
     
     # Team knowledge directories (git-tracked)
     mkdir -p .claude-team/{daily,memory,patterns,scripts,templates,archive}
@@ -92,30 +92,27 @@ create_directories() {
     echo -e "${GREEN}✓ Directories created${NC}"
 }
 
-# Download and install hooks
+# Install hooks configuration
 install_hooks() {
-    echo -e "${BLUE}🪝 Installing hooks...${NC}"
+    echo -e "${BLUE}🪝 Configuring hooks...${NC}"
     
-    # Determine which hooks to use
-    if [ "$SETUP_TYPE" == "team" ]; then
-        HOOKS_FILE="team.json"
+    # Check if settings.json already exists
+    if [ -f ".claude/settings.json" ]; then
+        echo -e "${YELLOW}⚠️  Found existing .claude/settings.json${NC}"
+        echo -e "${YELLOW}   To enable tracking, please manually add the hooks.${NC}"
+        echo -e "${YELLOW}   ${NC}"
+        echo -e "${YELLOW}   Copy the hooks configuration from:${NC}"
+        echo -e "${BLUE}   https://github.com/Aatish-Dhami/claude-lazy-genius#manual-hook-setup${NC}"
+        echo ""
     else
-        HOOKS_FILE="basic.json"
-    fi
-    
-    # Try to download from repo, fallback to embedded version
-    if curl -fsS "$REPO_URL/hooks/$HOOKS_FILE" > .claude/hooks.json 2>/dev/null; then
-        echo -e "${GREEN}✓ Hooks downloaded from repository${NC}"
-    else
-        # Embedded basic hooks (fallback)
-        cat > .claude/hooks.json << 'EOF'
+        # Create new settings.json with our hooks
+        cat > .claude/settings.json << 'EOF'
 {
-  "description": "Claude Lazy Genius - Automatic Knowledge System",
-  "version": "1.0.0",
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "hooks": {
     "SessionStart": [
       {
-        "description": "Initialize session with context",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
@@ -127,18 +124,26 @@ install_hooks() {
     "PostToolUse": [
       {
         "matcher": "Edit|MultiEdit|Write",
-        "description": "Track all file modifications",
         "hooks": [
           {
             "type": "command",
-            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]' || echo 'unknown'); echo \"$(date +%H:%M) Edit: $(echo $CLAUDE_TOOL_INPUT | grep -o '\"file_path\":[^,}]*' | cut -d'\"' -f4 || echo 'unknown')\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\""
+            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]' || echo 'unknown'); jq -r '.tool_input.file_path' | { read file_path; echo \"$(date +%H:%M) Edit: $file_path\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\"; }"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]' || echo 'unknown'); jq -r '.tool_input.file_path' | { read file_path; echo \"$(date +%H:%M) Created: $file_path\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\"; }"
           }
         ]
       }
     ],
-    "Stop": [
+    "SessionEnd": [
       {
-        "description": "Finalize session",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
@@ -150,7 +155,7 @@ install_hooks() {
   }
 }
 EOF
-        echo -e "${GREEN}✓ Hooks installed (embedded version)${NC}"
+        echo -e "${GREEN}✓ Hooks configured in .claude/settings.json${NC}"
     fi
 }
 

@@ -85,7 +85,7 @@ git pull
 ```
 YourProject/
 ├── .claude/                 # Your private config (git-ignored)
-│   └── hooks.json          # The magic - 3 simple hooks
+│   └── settings.json       # Hook configuration
 ├── .claude-team/           # Shared team knowledge
 │   ├── daily/             # Automatic activity logs
 │   ├── SOLUTIONS.md       # What works
@@ -160,17 +160,59 @@ Claude: "On 2024-01-20, you fixed the webpack issue by updating the babel loader
 ### Zero Config (Default)
 Works perfectly out of the box. No configuration needed.
 
-### Choose Your Hooks (Optional)
-```bash
-# Basic (solo dev) - Default
-cp hooks/basic.json .claude/hooks.json
+### Manual Hook Setup
+If you already have `.claude/settings.json`, add these hooks to enable tracking:
 
-# Team (multiple devs)
-cp hooks/team.json .claude/hooks.json
-
-# Advanced (power users)
-cp hooks/advanced.json .claude/hooks.json
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Session started: $(date +'%Y-%m-%d %H:%M:%S')\" > .claude/session.md && echo \"Developer: $(git config user.name || echo 'unknown')\" >> .claude/session.md"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]' || echo 'unknown'); jq -r '.tool_input.file_path' | { read file_path; echo \"$(date +%H:%M) Edit: $file_path\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\"; }"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]' || echo 'unknown'); jq -r '.tool_input.file_path' | { read file_path; echo \"$(date +%H:%M) Created: $file_path\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\"; }"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "DEV=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]' || echo 'unknown'); echo \"\\nSession ended: $(date +%H:%M)\\n---\\n\" >> \".claude-team/daily/$(date +%Y-%m-%d)-$DEV.md\""
+          }
+        ]
+      }
+    ]
+  }
+}
 ```
+
+Just add the `"hooks"` object to your existing settings.json file.
 
 ## 🤝 Contributing
 
